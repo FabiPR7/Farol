@@ -7,5 +7,5 @@ app.use(express.json());
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 1407;
 app.listen(PORT, () => console.log(`API on :${PORT}`));
