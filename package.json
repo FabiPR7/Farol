@@ -1,6 +1,8 @@
 {
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.1.0"
+  "name": "crm-backend",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo \"no build\"",
+    "predeploy": "echo \"optional: npx prisma migrate deploy\""
   }
 }
