@@ -5,7 +5,11 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: ['http://localhost:5173', 'https://tuapp.vercel.app'] }));
 
-app.get('/health', (_req, res) => res.json({ ok: true }));
+app.get('/health', (_req, res) => res.json({ ok: "Hola fabi"}));
+
+// 👇 monta las rutas de users
+app.use(usersRoutes);
+
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`API on :${PORT}`));
