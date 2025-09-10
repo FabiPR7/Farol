@@ -1,6 +1,6 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
-// Datos de conexión: puedes ponerlos en variables de entorno
 const pool = new Pool({
   user: process.env.PG_USER || 'tu_usuario',
   host: process.env.PG_HOST || 'localhost',
