@@ -5,9 +5,21 @@ const pool = require('../../bd/BdConnection');
 const bcrypt = require("bcrypt");
 const User = require('../Class/User');
 
-//  get all users
+
+
+async function wakeDB() {
+  try {
+    await pool.query('SELECT 1');
+    console.log('✅ Base de datos despierta');
+  } catch (err) {
+    console.error('❌ Error despertando la BD:', err);
+  }
+}
+
+
 router.get('/gaubd', async (req, res) => {
   try {
+    await wakeDB();
     const result = await pool.query('SELECT * FROM users');
     const usuarios = result.rows.map(row => 
       new User(row.iduser, row.email, null, row.datecreated)
@@ -21,8 +33,8 @@ router.get('/gaubd', async (req, res) => {
 
 router.post('/iubd', async (req, res) => {
     try {
+      await wakeDB();
       const { email, pwd } = req.body; 
-  
       if (!pwd || !email) {
         return res.status(400).json({ error: "Faltan datos: email y pwd son obligatorios" });
       }
@@ -48,6 +60,7 @@ router.post('/iubd', async (req, res) => {
 
   router.post('/lgubd', async (req, res) => {
     try {
+      await wakeDB();
       const { email, pwd } = req.body;
   
       if (!email || !pwd) {

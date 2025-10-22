@@ -3,12 +3,25 @@ const router = express.Router();
 const pool = require('../../bd/BdConnection');
 const Profile = require('../Class/Profile');
 
+async function wakeDB() {
+  try {
+    await pool.query('SELECT 1');
+    console.log('✅ Base de datos despierta');
+  } catch (err) {
+    console.error('❌ Error despertando la BD:', err);
+  }
+}
+
+
+
+// TENEMOS QUE CONECTAR BIEN LOS DATOS QUE ENVIAMO
 router.post('/ipbd', async (req, res) => {
     try {
-      const { name, lastname, iduser } = req.body; 
+      await wakeDB();
+      const { name, lastname, country, date, iduser } = req.body; 
   
       if (!name || !lastname || !iduser) {
-        return res.status(400).json({ error: "Faltan datos: name, lastname y iduser son obligatorios" });
+        return res.status(400).json({ error: "Faltan datos: name" });
       }
       const dateCreated = new Date();
       const profile = new Profile(null, name, lastname, iduser, dateCreated);
@@ -31,6 +44,7 @@ router.post('/ipbd', async (req, res) => {
 
   router.put('/uppcvsbd', async (req, res) => {
     try {
+      await wakeDB();
       const { iduser, presentation, cv, studies } = req.body;
   
       if (!iduser) {
