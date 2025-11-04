@@ -77,7 +77,7 @@ router.put('/uppcvsbd', async (req, res) => {
       return res.status(400).json({ error: "No se enviaron campos para actualizar" });
     }
 
-    const allowedColumns = ["presentation", "cv", "skill"];
+    const allowedColumns = ["presentation", "cv", "skills"];
     for (let col of Object.keys(updateFields)) {
       if (!allowedColumns.includes(col)) {
         throw new Error(`Columna no permitida: ${col}`);
