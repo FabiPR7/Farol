@@ -56,27 +56,44 @@ router.post("/ipbd", async (req, res) => {
     }
 
     //
-    res.status(500).json({ error: "Error al insertar o actualizar el usuario" } + err);
+    res.status(500).json({ error: "Error al insertar o actualizar el usuario" } + err + " CCC");
   }
 });
-
 router.put('/uppcvsbd', async (req, res) => {
   try {
     await wakeDB();
-    const { iduser, presentation, cv, studies } = req.body;
+    const { iduser, presentation, cv, skills: skill } = req.body;
 
     if (!iduser) {
       return res.status(400).json({ error: "El iduser es obligatorio para actualizar el perfil" });
     }
 
+    const updateFields = {};
+    if (presentation !== undefined) updateFields.presentation = presentation;
+    if (cv !== undefined) updateFields.cv = cv;
+    if (skill !== undefined) updateFields.skill = skill;
+
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({ error: "No se enviaron campos para actualizar" });
+    }
+
+    const allowedColumns = ["presentation", "cv", "skill"];
+    for (let col of Object.keys(updateFields)) {
+      if (!allowedColumns.includes(col)) {
+        throw new Error(`Columna no permitida: ${col}`);
+      }
+    }
+
+    const setClause = Object.keys(updateFields)
+      .map((col, i) => `${col} = $${i + 1}`)
+      .join(", ");
+
+    const values = Object.values(updateFields);
+    values.push(iduser);
+
     const result = await pool.query(
-      `UPDATE profiles 
-         SET presentation = $1, 
-             cv = $2, 
-             studies = $3
-         WHERE iduser = $4
-         RETURNING iduser, presentation, cv, studies`,
-      [presentation || null, cv || null, studies || null, iduser]
+      `UPDATE profiles SET ${setClause} WHERE iduser = $${values.length} RETURNING *`,
+      values
     );
 
     if (result.rowCount === 0) {
@@ -84,10 +101,9 @@ router.put('/uppcvsbd', async (req, res) => {
     }
 
     res.status(200).json(result.rows[0]);
-
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: "Error al actualizar el perfil" });
+    console.error("Error en /uppcvsbd:", err);
+    res.status(500).json({ error: "Error al actualizar el perfil", details: err.message });
   }
 });
 
