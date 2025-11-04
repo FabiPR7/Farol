@@ -62,7 +62,7 @@ router.post("/ipbd", async (req, res) => {
 router.put('/uppcvsbd', async (req, res) => {
   try {
     await wakeDB();
-    const { iduser, presentation, cv, skills: skill } = req.body;
+    const { iduser, presentation, cv, skills } = req.body;
 
     if (!iduser) {
       return res.status(400).json({ error: "El iduser es obligatorio para actualizar el perfil" });
@@ -71,7 +71,7 @@ router.put('/uppcvsbd', async (req, res) => {
     const updateFields = {};
     if (presentation !== undefined) updateFields.presentation = presentation;
     if (cv !== undefined) updateFields.cv = cv;
-    if (skill !== undefined) updateFields.skill = skill;
+    if (skills !== undefined) updateFields.skills = skills;
 
     if (Object.keys(updateFields).length === 0) {
       return res.status(400).json({ error: "No se enviaron campos para actualizar" });
