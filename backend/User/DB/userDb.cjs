@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../bd/BdConnection');
 const bcrypt = require("bcrypt");
-const User = require('../Class/User');
+const User = require('../Class/User.cjs');
 
 
 

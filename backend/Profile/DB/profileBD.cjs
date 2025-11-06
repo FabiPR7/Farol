@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../../bd/BdConnection');
-const Profile = require('../Class/Profile');
+const Profile = require('../Class/Profile.cjs');
 import FilenSDK from "filen";
 import multer from "multer";
 
