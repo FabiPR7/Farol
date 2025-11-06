@@ -1,0 +1,29 @@
+{
+  "name": "filen",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "try": "npm run build && node ."
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
+  "license": "MIT",
+  "author": "",
+  "keywords": [
+    "filen"
+  ],
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.13.1",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.0"
+  }
+}

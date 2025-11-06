@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../bd/BdConnection');
 const Profile = require('../Class/Profile');
+import FilenSDK from "filen";
+import multer from "multer";
+
+
+const upload = multer({ dest: "uploads/" });
+
+const filen = new FilenSDK({
+  email: "TU_EMAIL@ejemplo.com",
+  password: "TU_CONTRASEÑA"
+});
+
 
 async function wakeDB() {
   try {
@@ -12,6 +23,17 @@ async function wakeDB() {
   }
 }
 
+/*
+  INSERTAR PERFIL
+  name: string
+  lastname: string
+  country: string
+  date: date
+  iduser: number
+  presentation: string
+  cv: string
+  skills: string
+*/
 router.post("/ipbd", async (req, res) => {
   try {
     await wakeDB();
@@ -59,52 +81,56 @@ router.post("/ipbd", async (req, res) => {
     res.status(500).json({ error: "Error al insertar o actualizar el usuario" } + err + " CCC");
   }
 });
-router.put('/uppcvsbd', async (req, res) => {
+
+async function uploadCV(filePath) {
+  try {
+      const result = await filen.uploadFile({
+      path: filePath,
+      parent: "root"
+    });
+    return result;
+  } catch (err) {
+    throw new Error("Error subiendo archivo:", err);
+  }
+}
+
+/*
+  ACTUALIZAR PERFIL
+
+  presentation: string
+  cv: string
+  skills: string
+*/
+router.put("/uppcvsbd", upload.single("cv"), async (req, res) => {
   try {
     await wakeDB();
-    const { iduser, presentation, cv, skills } = req.body;
 
-    if (!iduser) {
-      return res.status(400).json({ error: "El iduser es obligatorio para actualizar el perfil" });
+    const { iduser, presentation, skills } = req.body;
+    if (!iduser) return res.status(400).json({ error: "iduser es obligatorio" });
+
+    let cvUUID = null;
+    if (req.file) {
+        const result = await uploadCV(req.file.path);
+        cvUUID = result.uuid;
     }
 
     const updateFields = {};
-    if (presentation !== undefined) updateFields.presentation = presentation;
-    if (cv !== undefined) updateFields.cv = cv;
-    if (skills !== undefined) updateFields.skills = skills;
-
-    if (Object.keys(updateFields).length === 0) {
-      return res.status(400).json({ error: "No se enviaron campos para actualizar" });
-    }
-
-    const allowedColumns = ["presentation", "cv", "skills"];
-    for (let col of Object.keys(updateFields)) {
-      if (!allowedColumns.includes(col)) {
-        throw new Error(`Columna no permitida: ${col}`);
-      }
-    }
+    if (presentation) updateFields.presentation = presentation;
+    if (cvUUID) updateFields.cv = cvUUID;
+    if (skills) updateFields.skills = skills;
 
     const setClause = Object.keys(updateFields)
       .map((col, i) => `${col} = $${i + 1}`)
       .join(", ");
+    const values = [...Object.values(updateFields), iduser];
 
-    const values = Object.values(updateFields);
-    values.push(iduser);
+    const query = `UPDATE profiles SET ${setClause} WHERE iduser = $${values.length} RETURNING *`;
+    const result = await pool.query(query, values);
 
-    const result = await pool.query(
-      `UPDATE profiles SET ${setClause} WHERE iduser = $${values.length} RETURNING *`,
-      values
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "Perfil no encontrado para este iduser" });
-    }
-
-    res.status(200).json(result.rows[0]);
+    res.json(result.rows[0]);
   } catch (err) {
-    console.error("Error en /uppcvsbd:", err);
+    console.error(err);
     res.status(500).json({ error: "Error al actualizar el perfil", details: err.message });
   }
 });
-
 module.exports = router;
