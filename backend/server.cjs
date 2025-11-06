@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const usersRoutes = require('./User/DB/userDb'); 
-const profileRoutes = require('./Profile/DB/profileBD');
+const usersRoutes = require('./User/DB/userDb.cjs'); 
+const profileRoutes = require('./Profile/DB/profileBD.cjs');
 
 app.use(express.json());
 app.use(cors({  origin: [

@@ -1,7 +1,7 @@
 {
   "name": "crm-backend",
   "scripts": {
-    "start": "node backend/server.js",
+    "start": "node backend/server.cjs",
     "build": "echo \"no build\"",
     "predeploy": "echo \"optional: npx prisma migrate deploy\""
   },
