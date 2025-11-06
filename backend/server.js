@@ -5,7 +5,14 @@ const usersRoutes = require('./User/DB/userDb');
 const profileRoutes = require('./Profile/DB/profileBD');
 
 app.use(express.json());
-app.use(cors({ origin: ['http://localhost:5173', 'https://tuapp.vercel.app'] }));
+app.use(cors({  origin: [
+    'http://localhost:5173',
+    'https://tuapp.vercel.app',
+    'https://farol-production.up.railway.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.options('*', cors());
 
 app.get('/health', (_req, res) => res.json({ ok: "Hola fabi"}));
 
